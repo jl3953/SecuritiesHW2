@@ -10,6 +10,13 @@ using namespace std;
 string extractCounter();
 
 /**
+* Appends the file that a user added to file keeping track of
+* whose file belongs to whom.
+* Returns 0 on success, non-zero on failure.
+*/
+int userfiles(string filename);
+
+/**
  * Adds a file to the protected directory. Returns 0 on success,
  * non-zero value otherwise.
  */

@@ -15,4 +15,4 @@ clean:
 run:
 	make clean
 	make
-	valgrind --leak-check=yes ./addqueue "hello.txt"
+	valgrind --leak-check=yes ./addqueue "addqueue.cpp"

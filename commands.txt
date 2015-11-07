@@ -4,3 +4,6 @@ sudo apt-get install clang++
 sudo apt-get install build-essentials
 sudo apt-get install clang
 sudo apt-get install git
+sudo apt-get install valgrind
+
+initialize userfiles with correct permissions
