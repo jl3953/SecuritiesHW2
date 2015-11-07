@@ -5,9 +5,13 @@
 #include <cassert>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define DIRECTORY "/home/tinyvm/test"
-#define USERFILENAME "/home/tinyvm/test/test/usersfiles"
+#define USERFILENAME "/home/tinyvm/test/usersfiles"
 
 int counter = 1;
 
@@ -22,14 +26,9 @@ string extractCounter()
 
 int userfiles(string filename)
 {
-    //get login
-    char userid[1000] = {'\0'};
-    if (getlogin_r(userid, 1000) != 0) return -1;
-    cout << string(userid) << endl;
-    
     //write to file
     std::ofstream outfile (USERFILENAME, ios_base::app);
-    outfile << string(userid) << " " << filename << "\n";
+    outfile << getuid() << " " << filename << "\n";
     outfile.close();
     return 0;
 }
@@ -69,6 +68,24 @@ int addqueue(string directory, string filename)
 
     return 0;
 }
+
+int checkPermissions(const char* filename)
+{
+    struct stat result;
+    stat(filename, &result);
+
+    //if owner, check owner bits for read permissions
+    if ( getuid() == result.st_uid)
+        return result.st_mode & S_IRUSR;
+    //if group, check group bits
+    else if ( getgid() == result.st_gid)
+        return result.st_mode & S_IRGRP;
+    //else, check other bits
+    else
+        return result.st_mode & S_IROTH;
+    
+}
+
 int main(int argc, char** argv)
 {
     //TIME OF CHECK VS TIME OF ACCESS--PERMISSIONS MAY CHANGE
@@ -76,7 +93,19 @@ int main(int argc, char** argv)
     for (i = 1; i < argc; i++)
     {
         cout << argv[i] << endl;
-        assert(addqueue(DIRECTORY, argv[i]) == 0);
+        if (!checkPermissions(argv[i]))
+        {
+            cerr << getuid() << " has insufficient "
+               "permissions on " << argv[i] <<
+               ". Cannot add to queue." << endl;
+        }
+        else {
+            if (addqueue(DIRECTORY, argv[i]) != 0)
+            {
+                cerr << "addqueue.c, main(), failed to add " << 
+                    argv[i] <<"to queue." << endl;
+            }
+        }
     }
 
     return 0;

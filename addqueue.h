@@ -22,4 +22,10 @@ int userfiles(string filename);
  */
 int addqueue(string directory, string filename);
 
+/**
+  * Checks if current executer of program has permissions to read
+  * the file it is trying to add to queue.
+  */
+int checkPermissions(const char* filename);
+
 #endif
