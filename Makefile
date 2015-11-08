@@ -17,8 +17,9 @@ addqueue.o: addqueue.h
 clean:
 	rm -rf *.o a.out addqueue showqueue core
 
-.PHONY: run
+.PHONY: test
 test:
 	make clean
 	make
 	valgrind --leak-check=yes ./addqueue addqueue.cpp /home/user02/hello.txt addqueue.h
+	valgrind --leak-check=yes ./showqueue
