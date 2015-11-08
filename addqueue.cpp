@@ -12,22 +12,37 @@
 
 #define DIRECTORY "/home/tinyvm/test"
 #define USERFILENAME "/home/tinyvm/test/usersfiles"
-
-int counter = 1;
+#define COUNTERFILE "/home/tinyvm/test/counter"
 
 using namespace std;
 
 string extractCounter()
 {
+    //read in current counter from counter file
+    ifstream counter(COUNTERFILE);
+    string s_number;
+    getline(counter, s_number);
+    counter.close();
+    int number = atoi(s_number.c_str());
+
+    //convert incremented counter to string
     ostringstream convert;
-    convert << counter++;
-    return convert.str();
+    convert << ++number;
+    string incremented = convert.str();
+
+    //overwrite old counter with new one
+    ofstream outfile(COUNTERFILE);
+    outfile << incremented;
+    outfile.close();
+
+    //return incremented counter
+    return incremented;
 }
 
 int userfiles(string filename)
 {
     //write to file
-    std::ofstream outfile (USERFILENAME, ios_base::app);
+    ofstream outfile (USERFILENAME, ios_base::app);
     outfile << getuid() << " " << filename << "\n";
     outfile.close();
     return 0;
@@ -41,15 +56,15 @@ int addqueue(string directory, string filename)
     if (original.is_open())
     {   
         //open file in protected directory
-        string name = directory + string("/file") + 
-            extractCounter();
+        string fname = string("file") + extractCounter();
+        string name = directory + string("/") + fname;
         
         //setting umask to protect file
         mode_t prev_umask = umask(077);
         ofstream fullpath (name.c_str());
 
         //keep track of which user is adding which file
-        if (userfiles(name) != 0)
+        if (userfiles(fname) != 0)
         {
             cerr << "addqueue.cpp, addqueue(), filename + user "
                 "could not be added to " << USERFILENAME << endl;
