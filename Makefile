@@ -1,21 +1,32 @@
 CC = clang++
-CFLAGS = -Wall -c -g
-LDFLAGS = -Wall -g
+CXX = clang++
+CXXFLAGS = -Wall -g
+LDFLAGS = -g
 
-default: addqueue showqueue
+default: addqueue showqueue rmqueue
 
-showqueue:
+rmqueue: showqueuefunctions.o rmqueuefunctions.o
 
-showqueue.o: showqueue.h
+rmqueue.o: rmqueue.h constants.h
 
-addqueue:
+rmqueuefunctions.o: rmqueue.h constants.h
 
-addqueue.o: addqueue.h
+showqueue: showqueuefunctions.o
+
+showqueue.o: showqueue.h constants.h
+
+showqueuefunctions.o: showqueue.h constants.h
+
+addqueue: addqueuefunctions.o
+
+addqueue.o: addqueue.h constants.h
+
+addqueuefunctions.o: addqueue.h constants.h
 
 
 .PHONY: clean
 clean:
-	rm -rf *.o a.out addqueue showqueue core
+	rm -rf *.o a.out addqueue showqueue core rmqueue
 
 .PHONY: test
 test:
