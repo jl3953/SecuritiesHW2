@@ -5,8 +5,13 @@
 #include <cassert>
 #include <fstream>
 #include <sstream>
+#include <dirent.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/stat.h>
 
 #define USERFILENAME "/home/tinyvm/test/usersfiles"
+#define DIRECTORY "/home/tinyvm/test"
 
 using namespace std;
 typedef string filename;
@@ -45,11 +50,62 @@ int convertToMap(map<filename, user>& fileToOwner)
     return 0;
 }
 
+int showqueue(const map<string, string>& fileToOwner)
+{
+    DIR *dir;
+    if ((dir = opendir (DIRECTORY))) 
+    {
+        struct dirent *ent;
+        struct stat file;
+        struct tm clock;
+        while ((ent = readdir (dir))) 
+        {
+            //get filename and owner
+            string fname = string(ent->d_name);
+            if (fileToOwner.find(fname) == fileToOwner.end())
+            {
+                //other random files in the directory not added
+                //by one of the users
+                continue;
+            }
+            string owner = fileToOwner.find(fname)->second;
+
+            //get timestamp
+            string fullname = string(DIRECTORY) + "/" + fname;
+            assert(stat(fullname.c_str(), &file) == 0);
+            localtime_r(&(file.st_mtime), &clock);
+            int min = clock.tm_min;
+            int hour = clock.tm_hour;
+            int day = clock.tm_mday;
+            int month = clock.tm_mon + 1;
+            int year = clock.tm_year + 1900;
+
+            //unique id
+            string uniqueID = fname;
+
+            cout << fname << "\t" << owner << "\t" <<
+                month << "-" << day << "-" << year << " " <<
+                hour << ":" << min << "\t" << uniqueID << endl;
+        }
+    } 
+    else {
+        cerr << "showqueue.cpp, showqueue(), could not open "
+            "directory: " << DIRECTORY << endl;
+        return -1;
+    }
+    
+    closedir (dir);
+    return 0;
+}
 
 int main()
 {
     map<filename, user> fileToOwner;
     assert(convertToMap(fileToOwner) == 0);
+
+    cout << "File\tOwner\tTimestamp\tUnique ID" << endl;
+    cout << "====\t=====\t=========\t=========" << endl;
+    assert(showqueue(fileToOwner) == 0);
 
     //test
     /*map<string, string>::iterator it;
