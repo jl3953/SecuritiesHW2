@@ -40,8 +40,12 @@ int addqueue(string directory, string filename)
     string line;
     if (original.is_open())
     {   
-        //open file in new directory
-        string name = directory + string("/file") + extractCounter();
+        //open file in protected directory
+        string name = directory + string("/file") + 
+            extractCounter();
+        
+        //setting umask to protect file
+        mode_t prev_umask = umask(077);
         ofstream fullpath (name.c_str());
 
         //keep track of which user is adding which file
@@ -55,8 +59,10 @@ int addqueue(string directory, string filename)
         //copy original file into protected directory
         while (getline(original, line))
             fullpath << line << "\n";
-        original.close();
         fullpath.close();
+        umask(prev_umask); //resetting umask to original mask
+
+        original.close();
         return 0;
     }
     else
