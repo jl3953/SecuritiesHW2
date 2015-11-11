@@ -4,16 +4,21 @@ CXXFLAGS = -Wall -g
 LDFLAGS = -g
 
 default: addqueue showqueue rmqueue
+	chmod u+s addqueue
+	chmod u+s showqueue
+	chmod u+s rmqueue
 
-rmqueue: showqueuefunctions.o rmqueuefunctions.o
+rmqueue: showqueuefunctions.o rmqueuefunctions.o showqueueObject.o
 
 rmqueue.o: rmqueue.h constants.h
 
 rmqueuefunctions.o: rmqueue.h constants.h
 
-showqueue: showqueuefunctions.o
+showqueue: showqueuefunctions.o showqueueObject.o
 
 showqueue.o: showqueue.h constants.h
+
+showqueueObject.o: showqueueObject.h
 
 showqueuefunctions.o: showqueue.h constants.h
 

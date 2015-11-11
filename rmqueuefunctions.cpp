@@ -16,8 +16,6 @@ int checkFileExistence(const map<filename, user>& fileToOwner,
         const string& fname)
 {
     //check if this filename exists as a key in the map
-    cout << "rmqueuefunctions.cpp, checkFileExistence, filename: "
-        << fname << endl;
     return fileToOwner.count(fname) > 0;
 }
 
@@ -42,22 +40,25 @@ int removeFiles(map<filename, user>& fileToOwner,
         string fullname = string(DIRECTORY) + string("/") + fname;
 
         //remove file from directory
+        assert(seteuid(PRIVILEGEDUSER) == 0);
         if (remove(fullname.c_str()) != 0)
         {
-            cerr << "rmqueue.cpp, removeFiles(), could not remove"
-                " file " << fname << " from " << DIRECTORY
-                << endl;
+            cerr << fname << ":\tX\tCould not remove file from " 
+                << DIRECTORY << endl;
+            assert(seteuid(getuid()) == 0);
             continue;
         }
+        assert(seteuid(getuid()) == 0);
 
         //remove file from map to prevent a duplicate name from
         //looking up the same filename and coming up positive
         fileToOwner.erase(fname);
+        cout << fname << ":\tY\t" << endl;
 
-        cout << "test, should be 0. result: " << fileToOwner.count(fname) << endl;
     }
 
     //remove file from usersfiles
+    assert(seteuid(PRIVILEGEDUSER) == 0);
     ofstream output(USERFILENAME);
     if (!output.is_open())
     {
@@ -71,6 +72,7 @@ int removeFiles(map<filename, user>& fileToOwner,
         output << it->second << " " << it->first << endl;
     }
     output.close();
+    assert(seteuid(getuid()) == 0);
 
     return 0;
 

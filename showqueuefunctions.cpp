@@ -10,6 +10,8 @@
 #include <time.h>
 #include <sys/stat.h>
 #include "constants.h"
+#include "showqueueObject.h"
+#include <vector>
 
 using namespace std;
 typedef string filename;
@@ -48,7 +50,8 @@ int convertToMap(map<filename, user>& fileToOwner)
     return 0;
 }
 
-int showqueue(const map<string, string>& fileToOwner)
+int showqueue(vector<ShowqueueObject>& sq,
+        const map<string, string>& fileToOwner)
 {
     DIR *dir;
     if ((dir = opendir (DIRECTORY))) 
@@ -72,6 +75,7 @@ int showqueue(const map<string, string>& fileToOwner)
             string fullname = string(DIRECTORY) + "/" + fname;
             assert(stat(fullname.c_str(), &file) == 0);
             localtime_r(&(file.st_mtime), &clock);
+            int sec = clock.tm_sec;
             int min = clock.tm_min;
             int hour = clock.tm_hour;
             int day = clock.tm_mday;
@@ -81,9 +85,9 @@ int showqueue(const map<string, string>& fileToOwner)
             //unique id
             string uniqueID = fname;
 
-            cout << fname << "\t" << owner << "\t" <<
-                month << "-" << day << "-" << year << " " <<
-                hour << ":" << min << "\t" << uniqueID << endl;
+            ShowqueueObject o(fname, owner, year, month, day,
+                    hour, min, sec, uniqueID);
+            sq.push_back(o);
         }
     } 
     else {

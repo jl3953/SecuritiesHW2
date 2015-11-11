@@ -3,6 +3,9 @@
 
 #include <map>
 #include <string>
+#include "showqueueObject.h"
+#include <vector>
+
 using namespace std;
 
 /**
@@ -16,6 +19,6 @@ int convertToMap(map<string, string>&);
   * Prints out all files in a directory.
   * Returns 0 on success, non-zero otherwise.
   */
-int showqueue(const map<string, string>&);
+int showqueue(vector<ShowqueueObject>&, const map<string, string>&);
 
 #endif

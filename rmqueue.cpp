@@ -12,6 +12,9 @@ using namespace std;
 int main(int argc, char** argv)
 {
 
+    //lower privilege
+    assert(seteuid(getuid()) == 0);
+
     //read in list of files and their owners
     map<filename, user> fileToOwner;
     assert(convertToMap(fileToOwner) == 0);
@@ -26,8 +29,8 @@ int main(int argc, char** argv)
         //check if filename is accurate / file exists
         if (!checkFileExistence(fileToOwner, fname))
         {
-            cerr << "Cannot remove file: " << fname << 
-                ". File is not present in printspooler." << endl;
+            cerr << fname << ":\tX\tFile does not exist in"
+               " printspooler." << endl;
             continue;
         }
 
@@ -35,9 +38,8 @@ int main(int argc, char** argv)
         if (canRemove(fileToOwner, fname))
             validFiles.push_back(fname);
         else
-            cerr << "Cannot remove file " << fname << " from"
-                " printspooler. User " << getuid() << 
-                "was not the user who added file." << endl;
+            cerr << fname << "\tX\tUser " << getuid() << 
+                " was not the user who added file." << endl;
     }
 
     assert(removeFiles(fileToOwner, validFiles) == 0);
