@@ -29,7 +29,7 @@ int main(int argc, char** argv)
         //check if filename is accurate / file exists
         if (!checkFileExistence(fileToOwner, fname))
         {
-            cerr << fname << ":\tX\tFile does not exist in"
+            cerr << fname << ": X File does not exist in"
                " printspooler." << endl;
             continue;
         }
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
         if (canRemove(fileToOwner, fname))
             validFiles.push_back(fname);
         else
-            cerr << fname << "\tX\tUser " << getuid() << 
+            cerr << fname << ": X User " << getuid() << 
                 " was not the user who added file." << endl;
     }
 

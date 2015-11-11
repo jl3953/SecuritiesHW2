@@ -43,7 +43,7 @@ int removeFiles(map<filename, user>& fileToOwner,
         assert(seteuid(PRIVILEGEDUSER) == 0);
         if (remove(fullname.c_str()) != 0)
         {
-            cerr << fname << ":\tX\tCould not remove file from " 
+            cerr << fname << ": X Could not remove file from " 
                 << DIRECTORY << endl;
             assert(seteuid(getuid()) == 0);
             continue;
@@ -53,7 +53,7 @@ int removeFiles(map<filename, user>& fileToOwner,
         //remove file from map to prevent a duplicate name from
         //looking up the same filename and coming up positive
         fileToOwner.erase(fname);
-        cout << fname << ":\tY\t" << endl;
+        cout << fname << ": Y " << endl;
 
     }
 

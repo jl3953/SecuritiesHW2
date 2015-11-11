@@ -17,9 +17,6 @@ int main()
     map<filename, user> fileToOwner;
     assert(convertToMap(fileToOwner) == 0);
 
-    cout << "File\t\tOwner\tTimestamp\t\tUnique ID" << endl;
-    cout << "====\t\t=====\t=========\t\t=========" << endl;
-
     vector<ShowqueueObject> sq;
     assert(showqueue(sq, fileToOwner) == 0);
 

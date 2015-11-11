@@ -16,10 +16,12 @@ using namespace std;
 string extractCounter()
 {
     //read in current counter from counter file
+    assert(seteuid(PRIVILEGEDUSER) == 0);
     ifstream counter(COUNTERFILE);
     string s_number;
     getline(counter, s_number);
     counter.close();
+    assert(seteuid(getuid()) == 0);
     int number = atoi(s_number.c_str());
 
     //convert incremented counter to string
@@ -41,9 +43,18 @@ string extractCounter()
 int userfiles(string originalFname)
 {
     //write to file
+    assert(seteuid(PRIVILEGEDUSER) == 0);
     ofstream outfile (USERFILENAME, ios_base::app);
+    if (!outfile.is_open())
+    {
+        assert(seteuid(getuid()) == 0);
+        cerr << "addqueue.cpp, usersfiles, outfile not open" << endl;
+        return -1;
+    }
     outfile << getuid() << " " << originalFname << "\n";
     outfile.close();
+
+    assert(seteuid(getuid()) == 0);
 
     return 0;
 }
@@ -57,14 +68,7 @@ int addqueue(string directory, string originalFname)
     {   
         //open file in protected directory
         string fname = string("fileid") + extractCounter();
-        string name = string(DIRECTORY) + string("/") + fname;
         
-        //setting umask to protect file--raising privilege
-        //to owner of directory in order to write
-        assert(seteuid(PRIVILEGEDUSER) == 0);
-        mode_t prev_umask = umask(077);
-        ofstream fullpath (name.c_str());
-
         //keep track of which user is adding which file
         if (userfiles(fname) != 0)
         {
@@ -72,7 +76,13 @@ int addqueue(string directory, string originalFname)
                 "could not be added to " << USERFILENAME << endl;
             return -1;
         }
+        
+        string name = string(DIRECTORY) + string("/") + fname;
+        mode_t prev_umask = umask(077);
 
+        assert(seteuid(PRIVILEGEDUSER) == 0);
+        ofstream fullpath (name.c_str());
+       
         //copy original file into protected directory
         while (getline(original, line))
         {
@@ -82,18 +92,18 @@ int addqueue(string directory, string originalFname)
 
         //lowering privilege again to original user and
         //resetting original mask
-        seteuid(getuid());
         umask(prev_umask); 
 
         original.close();
-
+        seteuid(getuid());
+        
         //printing success message
-        cout << originalFname << ":\tY\t" << fname << endl;
+        cout << originalFname << ": Y " << fname << endl;
         return 0;
     }
     else
     {
-        cerr << originalFname <<":\tX\tunable to open file." << 
+        cerr << originalFname <<": X unable to open file." << 
             endl;
         return -1;
     }
@@ -105,6 +115,10 @@ int checkPermissions(const char* originalFname)
 {
     struct stat result;
     stat(originalFname, &result);
+
+    //if directory, return false
+    if (S_ISDIR(result.st_mode))
+       return 0;
 
     //if owner, check owner bits for read permissions
     if ( getuid() == result.st_uid)

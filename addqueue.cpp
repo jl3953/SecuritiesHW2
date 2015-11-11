@@ -19,16 +19,12 @@ int main(int argc, char** argv)
     {
         if (!checkPermissions(argv[i]))
         {
-            cerr << argv[i] << ":\tX\tuser " << getuid() << 
+            cerr << argv[i] << ": X user " << getuid() << 
                 " has insufficient permissions on file"
                ". Cannot add to queue." << endl;
         }
         else {
-            if (addqueue(DIRECTORY, argv[i]) != 0)
-            {
-                /*cerr << "addqueue.c, main(), failed to add " << 
-                    argv[i] <<"to queue." << endl;*/
-            }
+            addqueue(DIRECTORY, argv[i]);
         }
     }
 

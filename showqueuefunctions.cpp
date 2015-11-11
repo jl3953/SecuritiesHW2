@@ -20,6 +20,7 @@ typedef string user;
 int convertToMap(map<filename, user>& fileToOwner)
 {
     //open file
+    assert(seteuid(PRIVILEGEDUSER) == 0);
     ifstream input(USERFILENAME);
     if (input.is_open())
     {
@@ -40,13 +41,14 @@ int convertToMap(map<filename, user>& fileToOwner)
     }
     else
     {
+        assert(seteuid(getuid()) == 0);
         cerr << "showqueue.c, convertToMap(), could not "
             "open users to files: " << USERFILENAME << endl;
-        input.close();
         return -1;
     }
     
     input.close();
+    assert(seteuid(getuid()) == 0);
     return 0;
 }
 
@@ -54,6 +56,7 @@ int showqueue(vector<ShowqueueObject>& sq,
         const map<string, string>& fileToOwner)
 {
     DIR *dir;
+    assert(seteuid(PRIVILEGEDUSER) == 0);
     if ((dir = opendir (DIRECTORY))) 
     {
         struct dirent *ent;
@@ -91,12 +94,14 @@ int showqueue(vector<ShowqueueObject>& sq,
         }
     } 
     else {
+        assert(seteuid(getuid()) == 0);
         cerr << "showqueue.cpp, showqueue(), could not open "
             "directory: " << DIRECTORY << endl;
         return -1;
     }
     
     closedir (dir);
+    assert(seteuid(getuid()) == 0);
     return 0;
 }
 

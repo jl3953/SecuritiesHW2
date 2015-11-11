@@ -15,9 +15,9 @@ ShowqueueObject::ShowqueueObject(string fname, string owner,
 
 ostream& operator<<(ostream& os, const ShowqueueObject& o)
 {
-    os << o.d_fname << "\t" << o.d_owner << "\t" <<
+    os << o.d_fname << " " << o.d_owner << " " <<
         o.d_year << "-" << o.d_month << "-" << o.d_day << "_" <<
-        o.d_hour << ":" << o.d_min << ":" << o.d_sec << "\t" <<
+        o.d_hour << ":" << o.d_min << ":" << o.d_sec << " " <<
         o.d_uniqueID;
     return os;
 }
